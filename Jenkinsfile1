@@ -2,7 +2,7 @@ pipeline{
     agent any
     tools{
         jdk 'jdk17'
-        nodejs 'node16'
+        nodejs 'node18'
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
@@ -49,17 +49,13 @@ stage('OWASP FS SCAN') {
                 sh "trivy fs . > trivyfs.txt"
             }
         }
-   stage("Docker Build & Push"){
-    steps{
-        script{
-            // Build the Docker image
-            sh "docker build -t devsecops_ad ."
-            
-            // Tag the Docker image
-            sh "docker tag devsecops_ad ockerlitud/devsecops_ad:latest"
-            
-            // Push the Docker image to the repository
-            sh "docker push ockerlitud/devsecops_ad:latest"
+stage("Docker Build & Push"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
+                       sh "docker build -t devsecops_ad ."
+                       sh "docker tag devsecops_ad praveensingam1994/devsecops_ad:latest "
+                       sh "docker push praveensingam1994/devsecops_ad:latest "
                     }
                 }
             }
